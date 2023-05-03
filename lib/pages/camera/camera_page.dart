@@ -1,12 +1,10 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:anidex/pages/camera/detection.dart';
+import 'package:anidex/pages/camera/scanresult.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// CameraApp is the Main Application.
 class CameraPage extends StatefulWidget {
@@ -62,6 +60,9 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Scan"),
+      ),
       body: !isInitilized
           ? const Center(child: CircularProgressIndicator())
           : GetBuilder<DetectionController>(builder: (state) {
@@ -96,7 +97,7 @@ class _CameraPageState extends State<CameraPage> {
                                   await file
                                       .writeAsBytes(await image.readAsBytes());
                                   state.labeling(file.path);
-                                  await controller.resumePreview();
+                                  Get.to(() => const ScanResult());
                                 },
                                 child: const Icon(
                                   Icons.camera_alt_rounded,
@@ -104,21 +105,10 @@ class _CameraPageState extends State<CameraPage> {
                                 ))
                           ],
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Text(
-                              state.result,
-                              textScaleFactor: 1.4,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
                       ],
                     ),
-                  ))
+                  )),
+                  const SizedBox(height: 10),
                 ],
               );
             }),

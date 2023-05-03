@@ -24,6 +24,7 @@ class Article {
 
 class Animal {
   String name;
+  int id;
   String description;
   String content;
   String type;
@@ -31,6 +32,7 @@ class Animal {
   int itsDay;
   Animal.fromJson(Map<String, dynamic> json)
       : name = json['name'],
+        id = json['id'],
         description = json['description'],
         content = json['content'],
         image = json['image'],
@@ -41,52 +43,66 @@ class Animal {
       {required this.name,
       required this.description,
       required this.content,
+      required this.id,
       required this.type,
       required this.itsDay,
       required this.image});
 }
 
 class ApiControllers extends GetxController {
-  String apiURL = "http://10.0.2.2:8000";
-  List<Article> articles = [];
-  List<Animal> animals = [];
+  String apiURL = "http://192.168.159.172:8000";
+  RxList articles = [].obs;
+  RxList animals = [].obs;
   Animal? todaysAnimal;
 
   Future<void> getArticles() async {
     articles.clear();
-    update();
+    // update();
+    // notifyChildrens();
     Uri uri = Uri.parse("$apiURL/articles/v1/articles/?format=json");
     try {
       http.Response response = await http.get(uri);
       if (response.statusCode == 200) {
         List data = jsonDecode(response.body);
-        for (var element in data) {
-          articles.add(Article.fromJson(element));
+        log("$data");
+        for (int i = 0; i < data.length; i++) {
+          articles.add(Article.fromJson(data[i]));
         }
       }
-      update();
+      // update();
     } catch (e) {
-      log("Error occured while fetching.. ", error: e);
+      log(
+        "Error occured while fetching.. $e ",
+      );
     }
   }
 
-  Future<void> getAnimals() async {
+  Future<void> getAnimals({String? filter}) async {
     animals.clear();
-    update();
+
     Uri uri = Uri.parse("$apiURL/animals/v1/animals/?format=json");
+    if (filter != null) {
+      uri = Uri.parse("$apiURL/animals/v1/animals/?search=$filter&format=json");
+    }
+    log(uri.toString());
     try {
       http.Response response = await http.get(uri);
       if (response.statusCode == 200) {
         List data = jsonDecode(response.body);
-        for (var element in data) {
-          animals.add(Animal.fromJson(element));
+        log("$data");
+        for (int i = 0; i < data.length; i++) {
+          animals.add(Animal.fromJson(data[i]));
         }
       }
-      todaysAnimal =
-          animals.firstWhere((element) => element.itsDay == DateTime.now().day);
       update();
+      try {
+        todaysAnimal = animals
+            .firstWhere((element) => element.itsDay == DateTime.now().day);
+      } catch (e) {
+        log("Eerr");
+      }
     } catch (e) {
-      log("Error occured while fetching.. ", error: e);
+      log("Error occured while fetching.. $e");
     }
   }
 

@@ -14,34 +14,43 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController search = TextEditingController();
   @override
+  void initState() {
+    ApiControllers c = Get.find<ApiControllers>();
+    c.getAnimals();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 80,
-          leadingWidth: 40,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: TextFormField(
-              controller: search,
-              decoration: inputDecoration(
-                  hintText: "Search",
-                  isRequired: true,
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: FloatingActionButton.small(
-                      backgroundColor: Colors.white,
-                      onPressed: () {},
-                      child: const Icon(
-                        Icons.search,
-                        color: Colors.pink,
+    return GetBuilder<ApiControllers>(builder: (state) {
+      return Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 80,
+            leadingWidth: 40,
+            title: Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: TextFormField(
+                controller: search,
+                decoration: inputDecoration(
+                    hintText: "Search",
+                    isRequired: true,
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: FloatingActionButton.small(
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          state.getAnimals(filter: search.text);
+                        },
+                        child: const Icon(
+                          Icons.search,
+                          color: Colors.pink,
+                        ),
                       ),
-                    ),
-                  )),
+                    )),
+              ),
             ),
           ),
-        ),
-        body: GetBuilder<ApiControllers>(builder: (state) {
-          return state.animals.isEmpty
+          body: state.animals.isEmpty
               ? const Center(
                   child: Text(
                     "No Animals Available",
@@ -51,7 +60,7 @@ class _SearchPageState extends State<SearchPage> {
               : GridView.builder(
                   itemCount: state.animals.length,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 10,
@@ -79,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                     );
-                  });
-        }));
+                  }));
+    });
   }
 }
