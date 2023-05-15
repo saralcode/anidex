@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  final String? filter;
+  const SearchPage({super.key, this.filter});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -16,7 +17,12 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     ApiControllers c = Get.find<ApiControllers>();
-    c.getAnimals();
+    if (widget.filter != null) {
+      search.text = widget.filter!;
+      setState(() {});
+    }
+    c.getAnimals(filter: widget.filter);
+
     super.initState();
   }
 
@@ -53,7 +59,7 @@ class _SearchPageState extends State<SearchPage> {
           body: state.animals.isEmpty
               ? const Center(
                   child: Text(
-                    "No Animals Available",
+                    "No Data Available",
                     textScaleFactor: 1.2,
                   ),
                 )

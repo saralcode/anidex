@@ -1,117 +1,181 @@
 import 'dart:io';
 
-import 'package:anidex/pages/camera/detection.dart';
 import 'package:anidex/pages/camera/scanresult.dart';
 import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// CameraApp is the Main Application.
 class CameraPage extends StatefulWidget {
-  /// Default Constructor
-  const CameraPage({Key? key}) : super(key: key);
+  const CameraPage({Key? key, required this.cameras}) : super(key: key);
+
+  final List<CameraDescription> cameras;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
 }
 
 class _CameraPageState extends State<CameraPage> {
-  List<CameraDescription> _cameras = [];
-  late CameraController controller;
-  bool isInitilized = false;
+  late CameraController _cameraController;
+  bool _isRearCameraSelected = true;
 
-  Future<void> initializeCamera() async {
-    _cameras = await availableCameras();
-    controller = CameraController(_cameras[0], ResolutionPreset.medium);
-    setState(() {});
-    try {
-      await controller.initialize();
-      isInitilized = true;
-      setState(() {});
-    } catch (e) {
-      if (e is CameraException) {
-        Get.back();
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            Get.snackbar("Access Denied", "Camera Access Denied");
-            break;
-          default:
-            Get.snackbar(e.code, "${e.description}");
-            break;
-        }
-      }
-    }
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
   }
 
   @override
   void initState() {
-    Get.put(DetectionController());
     super.initState();
-    initializeCamera();
+    initCamera(widget.cameras[0]);
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
+  Future takePicture() async {
+    if (!_cameraController.value.isInitialized) {
+      return null;
+    }
+    if (_cameraController.value.isTakingPicture) {
+      return null;
+    }
+    try {
+      await _cameraController.setFlashMode(FlashMode.off);
 
-    super.dispose();
+      XFile image = await _cameraController.takePicture();
+      File file =
+          File("/data/user/0/com.saralcode.anidex.anidex/cache/image.jpg");
+      await FileImage(File(file.path)).evict();
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+      await file.writeAsBytes(await image.readAsBytes());
+
+      await Get.to(() => ScanResult(path: file.path));
+    } on CameraException catch (e) {
+      debugPrint('Error occured while taking picture: $e');
+      return null;
+    }
+  }
+
+  Future initCamera(CameraDescription cameraDescription) async {
+    _cameraController = CameraController(
+      cameraDescription,
+      ResolutionPreset.high,
+      enableAudio: false,
+    );
+
+    try {
+      await _cameraController.initialize().then((_) {
+        if (!mounted) return;
+        setState(() {});
+      });
+    } on CameraException catch (e) {
+      debugPrint("camera error $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Scan"),
-      ),
-      body: !isInitilized
-          ? const Center(child: CircularProgressIndicator())
-          : GetBuilder<DetectionController>(builder: (state) {
-              return Column(
-                children: [
-                  Flexible(
-                    flex: 2,
-                    child: CameraPreview(controller),
-                  ),
-                  Flexible(
-                      child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
+        appBar: AppBar(
+          title: const Text("Take a Picture"),
+        ),
+        body: SafeArea(
+          child: Stack(children: [
+            (_cameraController.value.isInitialized)
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    child: AspectRatio(
+                        aspectRatio: 3 / 4,
+                        child: CameraPreview(_cameraController)),
+                  )
+                : Container(
+                    color: Colors.black,
+                    child: const Center(child: CircularProgressIndicator())),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.30,
+                  decoration: const BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(24)),
+                      color: Colors.white),
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
-                        const SizedBox(
-                          height: 20,
+                        Material(
+                          color: Colors.white,
+                          child: IconButton(
+                            iconSize: 30,
+                            icon: Icon(
+                                _isRearCameraSelected
+                                    ? Icons.camera_front
+                                    : Icons.camera_rear,
+                                color: Colors.blue),
+                            onPressed: () {
+                              setState(() => _isRearCameraSelected =
+                                  !_isRearCameraSelected);
+                              initCamera(widget
+                                  .cameras[_isRearCameraSelected ? 0 : 1]);
+                            },
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            FloatingActionButton(
-                                heroTag: "camera",
-                                backgroundColor: Colors.pink,
-                                onPressed: () async {
-                                  XFile image = await controller.takePicture();
-
-                                  File file = File(
-                                      "/data/user/0/com.saralcode.anidex.anidex/cache/image.jpg");
-                                  if (file.existsSync()) {
-                                    file.deleteSync();
-                                  }
-                                  await file
-                                      .writeAsBytes(await image.readAsBytes());
-                                  state.labeling(file.path);
-                                  Get.to(() => const ScanResult());
-                                },
-                                child: const Icon(
-                                  Icons.camera_alt_rounded,
-                                  color: Colors.white,
-                                ))
-                          ],
+                        Material(
+                          color: Colors.white,
+                          child: Container(
+                            height: 60,
+                            margin: const EdgeInsets.all(10),
+                            width: 60,
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 4, color: Colors.pink),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30)),
+                            child: IconButton(
+                              hoverColor: Colors.pink,
+                              focusColor: Colors.pink,
+                              onPressed: takePicture,
+                              iconSize: 50,
+                              splashRadius: 38,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon:
+                                  const Icon(Icons.circle, color: Colors.blue),
+                            ),
+                          ),
                         ),
-                      ],
-                    ),
-                  )),
-                  const SizedBox(height: 10),
-                ],
-              );
-            }),
-    );
+                        // const Spacer(),
+                        Material(
+                          color: Colors.white,
+                          child: IconButton(
+                              iconSize: 35,
+                              onPressed: () async {
+                                FilePickerResult? result =
+                                    await FilePicker.platform.pickFiles(
+                                  type: FileType.image,
+                                );
+                                if (result != null) {
+                                  Get.to(() => ScanResult(
+                                      path: result.files.first.path!));
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.photo_album,
+                                color: Colors.pink,
+                              )),
+                        )
+                      ]),
+                )),
+          ]),
+        ));
   }
 }
+
+
+
+/*
+
+
+*/

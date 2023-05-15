@@ -34,32 +34,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    "Description",
-                    textScaleFactor: 1.5,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    animal.description,
-                    textScaleFactor: 1.2,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                ],
-              ),
-            ),
             Markdown(
               data: animal.content,
               shrinkWrap: true,

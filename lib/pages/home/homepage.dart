@@ -1,6 +1,8 @@
 import 'package:anidex/controllers/api_controllers.dart';
 import 'package:anidex/pages/camera/camera_page.dart';
+import 'package:anidex/pages/profile/profile_page.dart';
 import 'package:anidex/pages/search/search_page.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -38,8 +40,11 @@ class _HomePageState extends State<HomePage> {
             FloatingActionButton.small(
                 heroTag: "camera",
                 backgroundColor: Colors.white,
-                onPressed: () {
-                  Get.to(() => const CameraPage());
+                onPressed: () async {
+                  List<CameraDescription> cameras = await availableCameras();
+                  Get.to(() => CameraPage(
+                        cameras: cameras,
+                      ));
                 },
                 child: const Icon(
                   Icons.camera_alt_rounded,
@@ -56,73 +61,83 @@ class _HomePageState extends State<HomePage> {
             children: [
               state.todaysAnimal == null
                   ? Container()
-                  : DefaultTextStyle(
-                      style: const TextStyle(color: Colors.white),
-                      child: Container(
-                        height: 150,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: const LinearGradient(
-                                colors: [Colors.indigo, Colors.blue])),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ClipRRect(
+                  : InkWell(
+                      onTap: () {
+                        Get.to(
+                            () => ProfilePage(index: state.todaysAnimalIndex));
+                      },
+                      child: DefaultTextStyle(
+                        style: const TextStyle(color: Colors.white),
+                        child: Container(
+                          height: 150,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              child: AspectRatio(
-                                aspectRatio: 1 / 1,
-                                child: Image.network(
-                                  state.todaysAnimal!.image,
-                                  fit: BoxFit.cover,
+                              gradient: const LinearGradient(
+                                  colors: [Colors.indigo, Colors.blue])),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: AspectRatio(
+                                  aspectRatio: 1 / 1,
+                                  child: Image.network(
+                                    state.todaysAnimal!.image,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: Wrap(
-                                clipBehavior: Clip.antiAlias,
-                                runAlignment: WrapAlignment.start,
-                                alignment: WrapAlignment.center,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                direction: Axis.vertical,
-                                spacing: 10,
-                                children: [
-                                  const Text(
-                                    "Animal of the Day",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        decorationStyle:
-                                            TextDecorationStyle.wavy,
-                                        decoration: TextDecoration.underline,
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    state.todaysAnimal!.name,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontFamily: "serif",
-                                        fontSize: 20,
-                                        letterSpacing: 2,
-                                        fontWeight: FontWeight.w900),
-                                  ),
-                                  SizedBox(
-                                    width: Get.size.width - 180,
-                                    child: Text(
-                                      state.todaysAnimal!.description,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  )
-                                ],
+                              const SizedBox(
+                                width: 10,
                               ),
-                            )
-                          ],
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  // clipBehavior: Clip.antiAlias,
+                                  // runAlignment: WrapAlignment.start,
+                                  // alignment: WrapAlignment.center,
+                                  // crossAxisAlignment: WrapCrossAlignment.center,
+                                  // direction: Axis.vertical,
+                                  // spacing: 10,
+                                  children: [
+                                    const Text(
+                                      "Animal of the Day",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          decorationStyle:
+                                              TextDecorationStyle.wavy,
+                                          decoration: TextDecoration.underline,
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Text(
+                                      state.todaysAnimal!.name,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontFamily: "serif",
+                                          fontSize: 20,
+                                          letterSpacing: 2,
+                                          fontWeight: FontWeight.w900),
+                                    ),
+                                    // SizedBox(
+                                    //   width: Get.size.width - 180,
+                                    //   child: Text(
+                                    //     state.todaysAnimal!.description,
+                                    //     maxLines: 3,
+                                    //     overflow: TextOverflow.ellipsis,
+                                    //   ),
+                                    // )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -105,6 +105,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  device_info_plus:
+    dependency: "direct main"
+    description:
+      name: device_info_plus
+      sha256: f52ab3b76b36ede4d135aab80194df8925b553686f0fa12226b4e2d658e45903
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.2.2"
+  device_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: device_info_plus_platform_interface
+      sha256: d3b01d5868b50ae571cd1dc6e502fc94d956b665756180f7b16ead09e836fd64
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -129,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.4"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      sha256: c7a8e25ca60e7f331b153b0cb3d405828f18d3e72a6fa1d9440c86556fffc877
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -176,22 +200,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.5"
-  google_mlkit_commons:
-    dependency: transitive
-    description:
-      name: google_mlkit_commons
-      sha256: "68429fa2e17686819dbaf2344790e3daa59924ef8625dd24f97f9deaaed42767"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_image_labeling:
-    dependency: "direct main"
-    description:
-      name: google_mlkit_image_labeling
-      sha256: f1bfc485406cd912f110b5ffd226550a73e1eb63560eeeb63cefdacd3f667c6e
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.0"
   http:
     dependency: "direct main"
     description:
