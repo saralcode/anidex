@@ -12,7 +12,7 @@ class ScanResult extends StatefulWidget {
   State<ScanResult> createState() => _ScanResultState();
 }
 
-class _ScanResultState extends State<ScanResult> with ImageCache {
+class _ScanResultState extends State<ScanResult>  {
   bool isLoading = true;
   Size imageSize = const Size(0, 0);
   Future<void> detectImage() async {
@@ -43,91 +43,81 @@ class _ScanResultState extends State<ScanResult> with ImageCache {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    clear();
-    super.dispose();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // await Get.offAll(() => const HomePage());
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Result"),
-        ),
-        body: GetBuilder<ApiControllers>(builder: (state) {
-          return isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : state.objectData.isEmpty
-                  ? const Center(
-                      child: Text("No Object Detected!"),
-                    )
-                  : Column(
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                              padding: const EdgeInsets.all(8.0),
-                              itemCount: state.objectData.length,
-                              itemBuilder: (context, index) {
-                                ObjectData label =
-                                    state.objectData.elementAt(index);
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Card(
-                                    elevation: 5,
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.all(10),
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  width: 2,
-                                                  color: Colors.pink)),
-                                          child: CustomPaint(
-                                            size: Size(imageSize.width,
-                                                imageSize.height),
-                                            foregroundPainter:
-                                                RectPaint(label.poly),
-                                            child: Image.file(
-                                              File(widget.path),
-                                              // height: 250,
-                                              // width: Get.size.width * 0.95,
-                                            ),
-                                          ),
-                                        ),
-                                        Card(
-                                          child: ListTile(
-                                            onTap: () async {
-                                              Get.to(() => SearchPage(
-                                                    filter: label.name,
-                                                  ));
-                                            },
-                                            title: Text(label.name),
-                                            trailing: Text(
-                                                "${((label.score * 100).toStringAsFixed(2))}%"),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                        ),
-                      ],
-                    );
-        }),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Result"),
       ),
+      body: GetBuilder<ApiControllers>(builder: (state) {
+        return isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : state.objectData.isEmpty
+                ? const Center(
+                    child: Text("No Object Detected!"),
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                            padding: const EdgeInsets.all(8.0),
+                            itemCount: state.objectData.length,
+                            itemBuilder: (context, index) {
+                              ObjectData label =
+                                  state.objectData.elementAt(index);
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  elevation: 5,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.all(10),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 2,
+                                                color: Colors.pink)),
+                                        child: CustomPaint(
+                                          size: Size(imageSize.width,
+                                              imageSize.height),
+                                          foregroundPainter:
+                                              RectPaint(label.poly),
+                                          child: Image.file(
+                                            File(widget.path),
+                                            // height: 250,
+                                            // width: Get.size.width * 0.95,
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        child: ListTile(
+                                          onTap: () async {
+                                            Get.to(() => SearchPage(
+                                                  filter: label.name,
+                                                ));
+                                          },
+                                          title: Text(label.name),
+                                          trailing: Text(
+                                              "${((label.score * 100).toStringAsFixed(2))}%"),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                      ),
+                    ],
+                  );
+      }),
     );
   }
 }

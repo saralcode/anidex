@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                                 child: AspectRatio(
                                   aspectRatio: 1 / 1,
                                   child: Image.network(
-                                    state.todaysAnimal!.image,
+                                    state.getImageUrl(state.todaysAnimal!.image),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                           child: AspectRatio(
                             aspectRatio: 1 / 1,
                             child: Image.network(
-                              article.image,
+                              state.getImageUrl(article.image),
                               fit: BoxFit.cover,
                             ),
                           ),

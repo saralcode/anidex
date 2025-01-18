@@ -30,7 +30,8 @@ class Article {
       {required this.title,
       required this.description,
       required this.url,
-      required this.image});
+      required this.image}
+    );
 }
 
 class Animal {
@@ -61,7 +62,7 @@ class Animal {
 }
 
 class ApiControllers extends GetxController {
-  String apiURL = "http://192.168.189.172:8000";
+  String apiURL = "https://7mrfbl6w-8000.inc1.devtunnels.ms";
   RxList articles = [].obs;
   RxList animals = [].obs;
   Animal? todaysAnimal;
@@ -150,6 +151,11 @@ class ApiControllers extends GetxController {
     } catch (e) {
       log("Error $e");
     }
+  }
+  String getImageUrl(String url){
+    String returnUrl =  url.replaceAll("http://localhost:8000", apiURL);
+    log(returnUrl);
+    return returnUrl;
   }
 
   @override

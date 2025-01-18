@@ -88,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                             subtitle: Text(animal.type),
                           ),
                           child: Image.network(
-                            animal.image,
+                            state.getImageUrl(animal.image),
                             fit: BoxFit.cover,
                           ),
                         ),

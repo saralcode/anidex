@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: AspectRatio(
                 aspectRatio: 1 / 1,
                 child: Image.network(
-                  animal.image,
+                  state.getImageUrl(animal.image),
                   fit: BoxFit.cover,
                 ),
               ),
